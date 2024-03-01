@@ -27,7 +27,7 @@ Para executar o projeto na sua máquina execute os seguintes passos no terminal.
 
 ## Demonstração 
 
-No vídeo a seguir [link](link) é possível conferir a solução em funcionamento com as seguintes funcionalidades que foram desenvolvidas. 
+No vídeo a seguir [https://youtu.be/ggt6pO0psZA](link) é possível conferir a solução em funcionamento com as seguintes funcionalidades que foram desenvolvidas. 
 
 - Ligar atuador
 - Desligar atuador 

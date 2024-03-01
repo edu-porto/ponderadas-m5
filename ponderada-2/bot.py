@@ -28,7 +28,7 @@ def process_steps(dados):
         return turn_off_tool()
     if operacao == "posição atual":
         return get_current_position()
-    
+
 
 def move_robot():
     # Cria uma instância do robô
@@ -44,7 +44,7 @@ def move_robot():
             y = int(typer.prompt("Digite o segundo número"))
             z = int(typer.prompt("Digite o terceiro número"))
             if x < 200 and y < 200 and z < 200:
-                robo.move_to(x, y, z, 39, wait=True)
+                robo.move_to(x, y, z, 0, wait=True)
                 return x, y, z
 
             else:
@@ -59,7 +59,6 @@ def reset_robot():
     # Define a velocidade e a aceleracao do robô
     robo.speed(30, 30)
 
-    # Move o robô para a posição (200, 0, 0)
     robo.move_to(0, 0, 0, 0, wait=True)
 
 def turn_on_tool():
@@ -91,6 +90,11 @@ def robot():
 
         # realiza a operação
         saida = process_steps(respostas)
+        
+        if respostas["operacao"] == "sair":
+            robo = pydobot.Dobot(port=choose_door, verbose=False)
+            robo.close()
+            break
 
         print(saida)
 
