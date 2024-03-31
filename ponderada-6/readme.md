@@ -9,12 +9,15 @@ O objetivo desta atividade é montar uma placa com o Raspberry Pi Pico e criar u
 Nesta atividade, foram realizados três itens:
 
 1. Esquemático da PCB, conforme visualizado na imagem abaixo:
+
    ![Esquemático](./assets/esquematico.png)
 
 2. Layout da PCB:
+
    ![PCB](./assets/pcb.png)
 
 3. Pasta Gerber que contém os arquivos necessários para que empresas possam fabricar o circuito desenvolvido. Na imagem a seguir, há uma representação da placa:
+
    ![3D](./assets/3d.png)
 
 ## Estrutura de Pastas
