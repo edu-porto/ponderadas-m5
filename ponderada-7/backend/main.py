@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request
 from tinydb import TinyDB, Query
 from flask_cors import CORS
 from datetime import datetime
+import pydobot
+from serial.tools import list_ports
 
 
 app = Flask(__name__)
@@ -57,6 +59,68 @@ def delete_log(log_id):
         db.remove(doc_ids=[log_id])
         return jsonify({'message': 'Log deleted successfully'})
     return jsonify({'error': 'Log not found'})
+
+
+
+
+############### ROTAS DO ROBÔ ############### 
+
+# Listas as portas seriais disponíveis
+available_ports = list_ports.comports()
+
+# Pede para o usuário escolher uma das portas disponíveis
+choose_door = available_ports[0].device  # For simplicity, I'm assuming the first port
+
+@app.route('/move-robot', methods=['POST'])
+def move_robot():
+    data = request.json
+    if "x" not in data or "y" not in data or "z" not in data:
+        return jsonify({"message": "Coordenadas x, y e z são necessárias."}), 400
+
+    robo = pydobot.Dobot(port=choose_door, verbose=False)
+    robo.speed(30, 30)
+
+    try:
+        x = int(data["x"])
+        y = int(data["y"])
+        z = int(data["z"])
+        if x < 200 and y < 200 and z < 200:
+            robo.move_to(x, y, z, 0, wait=True)
+            return jsonify({"x": x, "y": y, "z": z}), 200
+        else:
+            return jsonify({"message": "As coordenadas devem ser menores que 200."}), 400
+    except ValueError:
+        return jsonify({"message": "Entrada inválida. Por favor, insira um número inteiro válido."}), 400
+
+
+@app.route('/reset-robot', methods=['POST'])
+def reset_robot():
+    robo = pydobot.Dobot(port=choose_door, verbose=False)
+    robo.speed(30, 30)
+    robo.move_to(0, 0, 0, 0, wait=True)
+    return jsonify({"message": "Robô resetado"}), 200
+
+@app.route('/turn-on', methods=['POST'])
+def turn_on_tool():
+    robo = pydobot.Dobot(port=choose_door, verbose=False)
+    robo.suck(True)
+    return jsonify({"message": "Atuador ligado"}), 200
+
+@app.route('/turn-off', methods=['POST'])
+def turn_off_tool():
+    robo = pydobot.Dobot(port=choose_door, verbose=False)
+    robo.suck(False)
+    return jsonify({"message": "Atuador desligado"}), 200
+
+@app.route('/get-position', methods=['POST'])
+def get_current_position():
+    robo = pydobot.Dobot(port=choose_door, verbose=False)
+    posicao_atual = robo.pose()
+    return jsonify({"posicao_atual": posicao_atual}), 200
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
