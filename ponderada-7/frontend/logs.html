@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTMX Frontend</title>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org/dist/htmx.min.js"></script>
+</head>
+<body>
+    <h2>I'm the logs page</h2>
+
+    <div id="replaceMeContainer">
+        <ul id="logsList"></ul>
+        <button class='btn' hx-get="http://127.0.0.1:5000/get-logs"
+                            hx-target="#logsList"
+                            hx-swap="outerHTML">
+            Load logs
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('htmx:afterSwap', function(event) {
+            if (event.detail.trigger.getAttribute('hx-get') === "http://127.0.0.1:5000/get-logs") {
+                var logs = JSON.parse(event.detail.response);
+                var logsList = document.getElementById('logsList');
+                logsList.innerHTML = '';
+                logs.forEach(function(log) {
+                    var listItem = document.createElement('li');
+                    listItem.textContent = log.date + ' - ' + log.user_action;
+                    logsList.appendChild(listItem);
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
