@@ -13,24 +13,27 @@
         <ul id="logsList"></ul>
         <button class='btn' hx-get="http://127.0.0.1:5000/get-logs"
                             hx-target="#logsList"
-                            hx-swap="outerHTML">
+                            hx-swap="innerHTML">
             Load logs
         </button>
     </div>
 
     <script>
-        document.addEventListener('htmx:afterSwap', function(event) {
-            if (event.detail.trigger.getAttribute('hx-get') === "http://127.0.0.1:5000/get-logs") {
-                var logs = JSON.parse(event.detail.response);
-                var logsList = document.getElementById('logsList');
-                logsList.innerHTML = '';
-                logs.forEach(function(log) {
-                    var listItem = document.createElement('li');
-                    listItem.textContent = log.date + ' - ' + log.user_action;
-                    logsList.appendChild(listItem);
-                });
-            }
-        });
+document.addEventListener('htmx:afterSwap', function(event) {
+    var trigger = event.detail.trigger;
+    if (trigger && trigger.getAttribute('hx-get') === "http://127.0.0.1:5000/get-logs") {
+        var logs = JSON.parse(event.detail.response);
+        var logsList = document.getElementById('logsList');
+        if (logsList) {
+            logsList.innerHTML = '';
+            logs.forEach(function(log) {
+                var listItem = document.createElement('li');
+                listItem.textContent = log.date + ' - ' + log.user_action;
+                logsList.appendChild(listItem);
+            });
+        }
+    }
+});
     </script>
 
 </body>
