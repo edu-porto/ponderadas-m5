@@ -7,34 +7,42 @@
     <script src="https://cdn.jsdelivr.net/npm/htmx.org/dist/htmx.min.js"></script>
 </head>
 <body>
+    <header>
     <h2>I'm the logs page</h2>
+    <p> Here you can check the actions that users tried to do with the project</p>
+    </header>
 
     <div id="replaceMeContainer">
+        <h5>Logs list update every 5 seconds</h5>
         <ul id="logsList"></ul>
-        <button class='btn' hx-get="http://127.0.0.1:5000/get-logs"
-                            hx-target="#logsList"
-                            hx-swap="innerHTML">
-            Load logs
-        </button>
     </div>
 
+
+
     <script>
-document.addEventListener('htmx:afterSwap', function(event) {
-    var trigger = event.detail.trigger;
-    if (trigger && trigger.getAttribute('hx-get') === "http://127.0.0.1:5000/get-logs") {
-        var logs = JSON.parse(event.detail.response);
-        var logsList = document.getElementById('logsList');
-        if (logsList) {
-            logsList.innerHTML = '';
-            logs.forEach(function(log) {
-                var listItem = document.createElement('li');
-                listItem.textContent = log.date + ' - ' + log.user_action;
-                logsList.appendChild(listItem);
+        // Função que pega todos os logs e os mostra no front como lista 
+        function fetchLogs() {
+            fetch("http://127.0.0.1:5000/get-logs")
+            .then(response => response.json())
+            .then(data => {
+                // Limpa a lista dos logs
+                document.getElementById("logsList").innerHTML = "";
+                // Adiciona os logs como uma lista no front 
+                data.forEach(log => {
+                    document.getElementById("logsList").innerHTML += `
+                        <li>${log.date}, ${log.user_action}</li>
+                    `;
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching logs:', error);
             });
         }
-    }
-});
-    </script>
 
+        fetchLogs();
+
+        // Executa a função a cada 5 segundos 
+        setInterval(fetchLogs, 5000);
+    </script>
 </body>
 </html>

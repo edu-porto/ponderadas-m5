@@ -57,33 +57,30 @@
 
     <script>
         function submitForm(event) {
-            event.preventDefault(); // Prevent default form submission
+            event.preventDefault(); 
             
             var form = document.getElementById('myForm');
-            var formData = new FormData(form); // Create FormData object from form
+            var formData = new FormData(form); 
             
-            // Convert FormData to JSON object
+            // Converte FormData para um objeto JSON
             var jsonObject = {};
             formData.forEach(function(value, key){
                 jsonObject[key] = value;
             });
             
-            // Convert JSON object to string
             var jsonData = JSON.stringify(jsonObject);
             
-            // Create a new XMLHttpRequest object
+            // Cria uma nova requisição
             var xhr = new XMLHttpRequest();
             
-            // Open a POST request to the server
+            // Abre uma requisição POST
             xhr.open("POST", 'http://127.0.0.1:5000/move-robot', true);
             
-            // Set the Content-Type header to application/json
+            // Define o header da requisição e envia os dados do forms 
             xhr.setRequestHeader("Content-Type", "application/json");
             
-            // Send the JSON data to the server
             xhr.send(jsonData);
             
-            // Handle the response from the server
             xhr.onload = function () {
                 console.log(xhr.responseText);
             };

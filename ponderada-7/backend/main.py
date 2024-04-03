@@ -24,7 +24,6 @@ def add_log():
 
     return jsonify({'message': 'Log added successfully'})
 
-
 # Esta é a rota que retorna todos os logs 
 @app.route('/get-logs', methods=['GET'])
 def get_logs():
@@ -73,9 +72,27 @@ def add_log(message):
 # Listas as portas seriais disponíveis
 available_ports = list_ports.comports()
 
-# Pede para o usuário escolher uma das portas disponíveis
-choose_door = available_ports[0].device  # For simplicity, I'm assuming the first port
+# Escolhe a primeira porta como padrão
+choose_door = available_ports[0].device  
 
+
+# Essa função é utilizada pela api para ver se o robô está conectado ou não. 
+def check_robot_connection():
+    try:
+        real_door = available_ports[0].device
+        robo = pydobot.Dobot(port=real_door, verbose=False)
+        robo.close()
+        return "connected"
+    except Exception as e:
+        return "not connected"
+    
+# Rota para verificar a conexão do robô
+@app.route('/check-connection', methods=['GET'])
+def check_connection():
+    connection_status = check_robot_connection()
+    return jsonify({"status": connection_status})
+
+# Rota para mover o robô
 @app.route('/move-robot', methods=['POST'])
 def move_robot():
     data = request.json
@@ -104,11 +121,9 @@ def move_robot():
             return jsonify({"message": "As coordenadas devem ser menores que 200."}), 400
 
     except ValueError:
-        return jsonify({"message": "Entrada inválida. Por favor, insira um número inteiro válido."}), 400
+        return jsonify({"message": "Please input a valid number"}), 400
     
-
-
-
+# Rota que reseta o robô para a posição home
 @app.route('/reset-robot', methods=['POST'])
 def reset_robot():
     robo = pydobot.Dobot(port=choose_door, verbose=False)
@@ -118,6 +133,7 @@ def reset_robot():
 
     return jsonify({"message": "Robô resetado"}), 200
 
+# Liga o atuador do robô 
 @app.route('/turn-on', methods=['POST'])
 def turn_on_tool():
     robo = pydobot.Dobot(port=choose_door, verbose=False)
@@ -126,6 +142,7 @@ def turn_on_tool():
 
     return jsonify({"message": "Atuador ligado"}), 200
 
+# Desliga o atuador do robô
 @app.route('/turn-off', methods=['POST'])
 def turn_off_tool():
     robo = pydobot.Dobot(port=choose_door, verbose=False)
@@ -134,6 +151,7 @@ def turn_off_tool():
 
     return jsonify({"message": "Atuador desligado"}), 200
 
+# Retorna a posição atual do robô 
 @app.route('/get-position', methods=['POST'])
 def get_current_position():
     robo = pydobot.Dobot(port=choose_door, verbose=False)

@@ -7,10 +7,64 @@
     <script src="https://cdn.jsdelivr.net/npm/htmx.org/dist/htmx.min.js"></script>
 </head>
 <body>
-    <h1>HTMX Frontend</h1>
-    
+    <header>
+        <h1>HTMX Frontend</h1>
+    </header>
+
+    <h2>How the solution works</h2>
+    <p>You can interact with the robot only if you have it connect to your pc.</p>
+    <p>Otherwise, you are only able to check the logs </p>
+
+    <h4>Right now the robot is <span class="emphasized" id="robotStatus"></span> </h4> 
+    <div>
     <a href="robot.html" class="button" >Control the robot</a>
+    <br></br>
     <a href="logs.html"  class="button">Go see the logs</a>
+</div>
+
+
+<script>
+    // Função que checa o status do robô
+function fetchStatus() {
+    return fetch("http://127.0.0.1:5000/check-connection")
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+        document.getElementById("robotStatus").innerHTML = "";
+        // Adiciona o estado do robô no front 
+        document.getElementById("robotStatus").innerHTML += `${data.status}`;
+        return data.status;
+    })
+    .catch(error => {
+        console.error('Error fetching logs:', error);
+    });
+}
+    fetchStatus();
+
+    // Faz a requisição do status do robô a cada 5 segundos 
+    setInterval(fetchStatus, 5000);
+
+// Função que checa se o robô esta conectado e permite ou não o acesso a pagina de controlar o robô
+function handleControlClick(event) {
+    event.preventDefault();
+    fetchStatus().then(status => {
+        console.log(status);
+        if (status === 'not connected') { 
+            alert("The robot is not connected. You can only check the logs");
+        } else {
+            window.location.href = 'robot.html';
+        }
+    });
+}
+
+// Aciona o evento quando clica no link de controlar o robô para checar se há ou não conexão 
+document.querySelector('a[href="robot.html"]').addEventListener('click', handleControlClick);
+</script>
     
-    </body>
-    </html>
+</body>
+</html>
