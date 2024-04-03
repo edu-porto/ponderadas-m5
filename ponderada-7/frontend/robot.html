@@ -3,10 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTMX Frontend</title>
+    <title>Ponderada 7 - Robô</title>
     <script src="https://cdn.jsdelivr.net/npm/htmx.org/dist/htmx.min.js"></script>
 </head>
 <body>
+    
+    <header>
     <h2>I'm the robot page</h2>
+    </header>
+
+    <div>
+    <h4>Reset the robot</h4>
+    <button hx-post="http://127.0.0.1:5000/reset-robot" hx-trigger="click" hx-target="#outputReset" hx-swap="innerHTML" hx-indicator="dots">Reset robot</button>
+    <div id="outputReset"></div>
+    </div>
+
+    <div>
+        <h4>Get the robot Position</h4>
+        <button hx-post="http://127.0.0.1:5000/get-position" hx-trigger="click" hx-target="#outputPosition" hx-swap="innerHTML" hx-indicator="dots">Get robot position</button>
+        <div id="outputPosition"></div>
+
+    </div>
+
+    <div>
+        <h4>Move the robot</h4>
+        <form id="myForm" hx-post="http://127.0.0.1:5000/move-robot" hx-trigger="submit" onsubmit="submitForm(event)">
+            X : <input type="number" name="x" />
+            <br></br>
+            Y : <input type="number" name="y" />
+            <br></br>
+            Z : <input type="number" name="z" />
+            <br></br>
+            R : <input type="number" name="r" />
+            <br></br>
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+
+    <div>
+        <h4>Turn on tool</h4>
+        <button hx-post="http://127.0.0.1:5000/turn-on" hx-trigger="click" hx-target="#onTool" hx-swap="innerHTML" >ON</button>
+        <div id="onTool"></div>
+    </div>
+
+    <div>
+        <h4>Turn off tool</h4>
+        <button hx-post="http://127.0.0.1:5000/turn-off" hx-trigger="click" hx-target="#offTool" hx-swap="innerHTML" >OFF</button>
+        <div id="offTool"></div>
+    </div>
+    
+
+    <!-- Esse script tem a função de fazer o post na API do backend, enviando os dados de movimento do robô.  -->
+
+    <script>
+        function submitForm(event) {
+            event.preventDefault(); // Prevent default form submission
+            
+            var form = document.getElementById('myForm');
+            var formData = new FormData(form); // Create FormData object from form
+            
+            // Convert FormData to JSON object
+            var jsonObject = {};
+            formData.forEach(function(value, key){
+                jsonObject[key] = value;
+            });
+            
+            // Convert JSON object to string
+            var jsonData = JSON.stringify(jsonObject);
+            
+            // Create a new XMLHttpRequest object
+            var xhr = new XMLHttpRequest();
+            
+            // Open a POST request to the server
+            xhr.open("POST", 'http://127.0.0.1:5000/move-robot', true);
+            
+            // Set the Content-Type header to application/json
+            xhr.setRequestHeader("Content-Type", "application/json");
+            
+            // Send the JSON data to the server
+            xhr.send(jsonData);
+            
+            // Handle the response from the server
+            xhr.onload = function () {
+                console.log(xhr.responseText);
+            };
+        }
+    </script>
     </body>
     </html>
